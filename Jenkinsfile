@@ -1,3 +1,6 @@
+// change the image version to match the node version in your device
+//may also need to change in the package.json file
+
 pipeline {
     agent any
     stages {
