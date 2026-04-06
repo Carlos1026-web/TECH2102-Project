@@ -1,6 +1,3 @@
-// change the image version to match the node version in your device
-//may also need to change in the package.json file
-
 pipeline {
     agent any
     stages {
@@ -9,7 +6,7 @@ pipeline {
                 docker {
                     image 'node:24.14.0-alpine'
                     reuseNode true
-                    }
+                }
             }
             steps {
                 sh '''
@@ -22,17 +19,27 @@ pipeline {
                 '''
             }
         }
+
         stage('Test'){
             agent {
                 docker {
                     image 'node:24.14.0-alpine'
                     reuseNode true
-                    }
+                }
             }
             steps {
                 sh '''
                     test -f build/index.html
-                    npm test
+                    npm test -- --watchAll=false
+                '''
+            }
+        }
+
+        stage('Build My Docker Image'){
+            steps {
+                sh '''
+                    docker build -t tech2102-group13 .
+                    docker images
                 '''
             }
         }
