@@ -44,13 +44,6 @@ pipeline {
         }
 
         stage('Build My Docker Image'){
-             agent{
-                docker{
-                    image 'docker:26-cli'
-                    reuseNode true
-                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=""'
-                }
-            }
             steps {
                 sh '''
                     docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
@@ -60,13 +53,6 @@ pipeline {
         }
 
         stage('Push Docker Image to ECR') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    reuseNode true
-                    args '-u root --entrypoint=""'
-                }
-            }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'aws-ecr-creds',
