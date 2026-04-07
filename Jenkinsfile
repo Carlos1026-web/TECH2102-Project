@@ -53,13 +53,13 @@ pipeline {
         }
 
         stage('Push Docker Image to ECR') {
-            // agent {
-            //     docker {
-            //         image 'amazon/aws-cli'
-            //         reuseNode true
-            //         args '-u root --entrypoint=""'
-            //     }
-            // }
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    reuseNode true
+                    args '-u root --entrypoint=""'
+                }
+            }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'aws-ecr-creds',
@@ -68,6 +68,8 @@ pipeline {
                 )]) {
                     sh '''
                         aws --version
+                        yum install jq -y
+
                         export AWS_ACCESS_KEY_ID=$AWS_USER
                         export AWS_SECRET_ACCESS_KEY=$AWS_PASS
                         export AWS_DEFAULT_REGION=${AWS_REGION}
