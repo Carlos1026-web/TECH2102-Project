@@ -44,6 +44,13 @@ pipeline {
         }
 
         stage('Build My Docker Image'){
+             agent{
+                docker{
+                    image 'docker:26-cli'
+                    reuseNode true
+                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=""'
+                }
+            }
             steps {
                 sh '''
                     docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
