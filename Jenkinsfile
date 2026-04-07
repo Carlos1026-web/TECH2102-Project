@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        ECR_REPO = '690640932759.dkr.ecr.us-east-1.amazonaws.com/tech2102-project-group13'
+        ECR_REPO = '806169617511.dkr.ecr.us-east-1.amazonaws.com/tech2102-project-group13'
         IMAGE_NAME = 'tech2102-group13'
         IMAGE_TAG = 'latest'
     }
@@ -53,13 +53,13 @@ pipeline {
         }
 
         stage('Push Docker Image to ECR') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    reuseNode true
-                    args '-u root --entrypoint=""'
-                }
-            }
+            // agent {
+            //     docker {
+            //         image 'amazon/aws-cli'
+            //         reuseNode true
+            //         args '-u root --entrypoint=""'
+            //     }
+            // }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'aws-ecr-creds',
@@ -72,7 +72,7 @@ pipeline {
                         export AWS_SECRET_ACCESS_KEY=$AWS_PASS
                         export AWS_DEFAULT_REGION=${AWS_REGION}
 
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin 690640932759.dkr.ecr.us-east-1.amazonaws.com
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
 
                         docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}
                         docker push ${ECR_REPO}:${IMAGE_TAG}
