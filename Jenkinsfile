@@ -1,4 +1,3 @@
-//test
 pipeline {
     agent any
 
@@ -54,6 +53,13 @@ pipeline {
         }
 
         stage('Push Docker Image to ECR') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    reuseNode true
+                    args '-u root --entrypoint=""'
+                }
+            }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'aws-ecr-creds',
