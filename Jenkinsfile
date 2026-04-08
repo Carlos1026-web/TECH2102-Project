@@ -10,34 +10,18 @@ pipeline {
 
     stages {
         stage('Build'){
-            agent {
-                docker {
-                    image 'node:24.14.0-alpine'
-                    reuseNode true
-                }
-            }
             steps {
-                sh '''
-                    ls -la
-                    node --version
-                    npm --version
+                bat '''
                     npm install
-                    CI='' npm run build
-                    ls -la
+                    set CI=false
+                    npm run build
                 '''
             }
         }
 
         stage('Test'){
-            agent {
-                docker {
-                    image 'node:24.14.0-alpine'
-                    reuseNode true
-                }
-            }
             steps {
-                sh '''
-                    test -f build/index.html
+                bat '''
                     npm test -- --watchAll=false
                 '''
             }
@@ -45,8 +29,8 @@ pipeline {
 
         stage('Build My Docker Image'){
             steps {
-                sh '''
-                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                bat '''
+                    docker build -t %IMAGE_NAME%:%IMAGE_TAG% .
                     docker images
                 '''
             }
@@ -59,16 +43,15 @@ pipeline {
                     usernameVariable: 'AWS_USER',
                     passwordVariable: 'AWS_PASS'
                 )]) {
-                    sh '''
-                        aws --version
-                        export AWS_ACCESS_KEY_ID=$AWS_USER
-                        export AWS_SECRET_ACCESS_KEY=$AWS_PASS
-                        export AWS_DEFAULT_REGION=${AWS_REGION}
+                    bat '''
+                        set AWS_ACCESS_KEY_ID=%AWS_USER%
+                        set AWS_SECRET_ACCESS_KEY=%AWS_PASS%
+                        set AWS_DEFAULT_REGION=%AWS_REGION%
 
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin 545349725573.dkr.ecr.us-east-1.amazonaws.com
+                        aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin 545349725573.dkr.ecr.us-east-1.amazonaws.com
 
-                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}
-                        docker push ${ECR_REPO}:${IMAGE_TAG}
+                        docker tag %IMAGE_NAME%:%IMAGE_TAG% %ECR_REPO%:%IMAGE_TAG%
+                        docker push %ECR_REPO%:%IMAGE_TAG%
                     '''
                 }
             }
@@ -81,18 +64,14 @@ pipeline {
                     usernameVariable: 'AWS_USER',
                     passwordVariable: 'AWS_PASS'
                 )]) {
-                    sh '''
-                        export AWS_ACCESS_KEY_ID=$AWS_USER
-                        export AWS_SECRET_ACCESS_KEY=$AWS_PASS
-                        export AWS_DEFAULT_REGION=${AWS_REGION}
+                    bat '''
+                        set AWS_ACCESS_KEY_ID=%AWS_USER%
+                        set AWS_SECRET_ACCESS_KEY=%AWS_PASS%
+                        set AWS_DEFAULT_REGION=%AWS_REGION%
 
                         aws ecs register-task-definition --cli-input-json file://taskdef.json
 
-                        aws ecs update-service \
-                            --cluster tech2102-cluster \
-                            --service tech2102-service \
-                            --task-definition react-app-task \
-                            --force-new-deployment
+                        aws ecs update-service --cluster tech2102-cluster --service tech2102-service --task-definition react-app-task --force-new-deployment
                     '''
                 }
             }
