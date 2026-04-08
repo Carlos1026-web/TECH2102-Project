@@ -72,6 +72,29 @@ pipeline {
                     '''
                 }
             }
+            stage('Deploy to AWS') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-ecr-creds',
+                    usernameVariable: 'AWS_USER',
+                    passwordVariable: 'AWS_PASS'
+                )]) {
+                    sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_USER
+                        export AWS_SECRET_ACCESS_KEY=$AWS_PASS
+                        export AWS_DEFAULT_REGION=${AWS_REGION}
+
+                        aws ecs register-task-definition --cli-input-json file://taskdef.json
+
+                        aws ecs update-service \
+                            --cluster tech2102-cluster \
+                            --service tech2102-service \
+                            --task-definition react-app-task \
+                            --force-new-deployment
+                    '''
+                }
+            }
+        }
         }
     }
 }
