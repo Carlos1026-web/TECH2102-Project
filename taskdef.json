@@ -7,7 +7,7 @@
   "containerDefinitions": [
     {
       "name": "react-app",
-      "image": "690640932759.dkr.ecr.us-east-1.amazonaws.com/tech2102-project-group13:latest",
+      "image": "545349725573.dkr.ecr.us-east-1.amazonaws.com/tech2102-project-group13:latest",
       "portMappings": [
         {
           "containerPort": 80,

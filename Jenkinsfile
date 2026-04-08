@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = 'us-east-1'
-        ECR_REPO = '690640932759.dkr.ecr.us-east-1.amazonaws.com/tech2102-project-group13'
-        IMAGE_NAME = 'tech2102-group13'
-        IMAGE_TAG = 'latest'
-    }
+    AWS_REGION = 'us-east-1'
+    ECR_REPO = '545349725573.dkr.ecr.us-east-1.amazonaws.com/tech2102-project-group13'
+    IMAGE_NAME = 'tech2102-project-group13'
+    IMAGE_TAG = 'latest'
+}
 
     stages {
         stage('Build'){
