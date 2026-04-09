@@ -31,29 +31,29 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_USER', passwordVariable: 'AWS_PASS')]) {
                     bat 'set AWS_ACCESS_KEY_ID=%AWS_USER%&& set AWS_SECRET_ACCESS_KEY=%AWS_PASS%&& set AWS_DEFAULT_REGION=us-east-1&& aws ecr get-login-password --region us-east-1 > ecr_password.txt'
-                    bat 'docker login --username AWS --password-stdin 545349725573.dkr.ecr.us-east-1.amazonaws.com < ecr_password.txt'
+                    bat 'docker login --username AWS --password-stdin 806169617511.dkr.ecr.us-east-1.amazonaws.com < ecr_password.txt'
                     bat 'docker tag %IMAGE_NAME%:%IMAGE_TAG% %ECR_REPO%:%IMAGE_TAG%'
                     bat 'docker push %ECR_REPO%:%IMAGE_TAG%'
                 }
             }
         }
-                withCredentials([usernamePassword(
-                    credentialsId: 'aws-ecr-creds',
-                    usernameVariable: 'AWS_USER',
-                    passwordVariable: 'AWS_PASS'
-                )]) {
-                    sh '''
-                        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                        unzip -q awscliv2.zip
-                        ./aws/install --install-dir $HOME/.local/aws-cli --bin-dir $HOME/.local/bin
-                        export PATH=$PATH:$HOME/.local/bin
-                        aws --version
+                // withCredentials([usernamePassword(
+                //     credentialsId: 'aws-ecr-creds',
+                //     usernameVariable: 'AWS_USER',
+                //     passwordVariable: 'AWS_PASS'
+                // )]) {
+                //     sh '''
+                //         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                //         unzip -q awscliv2.zip
+                //         ./aws/install --install-dir $HOME/.local/aws-cli --bin-dir $HOME/.local/bin
+                //         export PATH=$PATH:$HOME/.local/bin
+                //         aws --version
 
-                        export AWS_ACCESS_KEY_ID=$AWS_USER
-                        export AWS_SECRET_ACCESS_KEY=$AWS_PASS
-                        export AWS_DEFAULT_REGION=${AWS_REGION}
+                //         export AWS_ACCESS_KEY_ID=$AWS_USER
+                //         export AWS_SECRET_ACCESS_KEY=$AWS_PASS
+                //         export AWS_DEFAULT_REGION=${AWS_REGION}
 
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
+                //         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
 
         stage('Deploy to AWS') {
             steps {
