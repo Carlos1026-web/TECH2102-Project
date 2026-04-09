@@ -82,7 +82,7 @@ pipeline {
                         export AWS_SECRET_ACCESS_KEY=$AWS_PASS
                         export AWS_DEFAULT_REGION=us-east-1
                         aws ecs register-task-definition --cli-input-json file://taskdef.json
-                        aws ecs update-service --cluster tech2102-cluster --service tech2102-service --task-definition react-app-task --force-new-deployment
+                        aws ecs update-service --cluster tech2102-cluster --service react-app-task-service-k48s6tue --task-definition react-app-task --force-new-deployment
                     '''
                 }
             }
