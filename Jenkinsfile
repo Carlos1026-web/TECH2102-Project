@@ -57,7 +57,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_USER', passwordVariable: 'AWS_PASS')]) {
                     sh '''
                         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                        unzip -q awscliv2.zip
+                        unzip -qo awscliv2.zip
                         ./aws/install --install-dir $HOME/.local/aws-cli --bin-dir $HOME/.local/bin
                         export PATH=$PATH:$HOME/.local/bin
                         aws --version
