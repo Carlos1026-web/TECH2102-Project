@@ -10,20 +10,45 @@ pipeline {
 
     stages {
         stage('Build'){
+            agent {
+                docker {
+                    image 'node:24.14.0-alpine'
+                    reuseNode true
+                }
+            }
             steps {
-                bat 'npm install && npm run build'
+                sh '''
+                    ls -la
+                    node --version
+                    npm --version
+                    npm install
+                    CI='' npm run build
+                    ls -la
+                '''
             }
         }
 
         stage('Test'){
+            agent {
+                docker {
+                    image 'node:24.14.0-alpine'
+                    reuseNode true
+                }
+            }
             steps {
-                bat 'set CI=true && npm test -- --watchAll=false --passWithNoTests'
+                sh '''
+                    test -f build/index.html
+                    npm test -- --watchAll=false
+                '''
             }
         }
 
         stage('Build My Docker Image'){
             steps {
-                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% . && docker images'
+                sh '''
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker images
+                '''
             }
         }
 
