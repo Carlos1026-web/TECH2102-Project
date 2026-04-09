@@ -58,7 +58,7 @@ pipeline {
                     sh '''
                         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                         unzip -qo awscliv2.zip
-                        ./aws/install --install-dir $HOME/.local/aws-cli --bin-dir $HOME/.local/bin
+                        ./aws/install --install-dir $HOME/.local/aws-cli --bin-dir $HOME/.local/bin --update
                         export PATH=$PATH:$HOME/.local/bin
                         aws --version
 
