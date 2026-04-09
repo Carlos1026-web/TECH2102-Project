@@ -55,10 +55,14 @@ pipeline {
         stage('Push Docker Image to ECR') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_USER', passwordVariable: 'AWS_PASS')]) {
-                    bat 'set AWS_ACCESS_KEY_ID=%AWS_USER%&& set AWS_SECRET_ACCESS_KEY=%AWS_PASS%&& set AWS_DEFAULT_REGION=us-east-1&& aws ecr get-login-password --region us-east-1 > ecr_password.txt'
-                    bat 'docker login --username AWS --password-stdin 806169617511.dkr.ecr.us-east-1.amazonaws.com < ecr_password.txt'
-                    bat 'docker tag %IMAGE_NAME%:%IMAGE_TAG% %ECR_REPO%:%IMAGE_TAG%'
-                    bat 'docker push %ECR_REPO%:%IMAGE_TAG%'
+                    sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_USER
+                        export AWS_SECRET_ACCESS_KEY=$AWS_PASS
+                        export AWS_DEFAULT_REGION=us-east-1
+                        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 806169617511.dkr.ecr.us-east-1.amazonaws.com
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}
+                        docker push ${ECR_REPO}:${IMAGE_TAG}
+                    '''
                 }
             }
         }
@@ -83,8 +87,13 @@ pipeline {
         stage('Deploy to AWS') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_USER', passwordVariable: 'AWS_PASS')]) {
-                    bat 'set AWS_ACCESS_KEY_ID=%AWS_USER%&& set AWS_SECRET_ACCESS_KEY=%AWS_PASS%&& set AWS_DEFAULT_REGION=us-east-1&& aws ecs register-task-definition --cli-input-json file://taskdef.json'
-                    bat 'set AWS_ACCESS_KEY_ID=%AWS_USER%&& set AWS_SECRET_ACCESS_KEY=%AWS_PASS%&& set AWS_DEFAULT_REGION=us-east-1&& aws ecs update-service --cluster tech2102-cluster --service tech2102-service --task-definition react-app-task --force-new-deployment'
+                    sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_USER
+                        export AWS_SECRET_ACCESS_KEY=$AWS_PASS
+                        export AWS_DEFAULT_REGION=us-east-1
+                        aws ecs register-task-definition --cli-input-json file://taskdef.json
+                        aws ecs update-service --cluster tech2102-cluster --service tech2102-service --task-definition react-app-task --force-new-deployment
+                    '''
                 }
             }
         }
