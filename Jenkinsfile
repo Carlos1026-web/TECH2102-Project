@@ -56,6 +56,12 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_USER', passwordVariable: 'AWS_PASS')]) {
                     sh '''
+                        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                        unzip -q awscliv2.zip
+                        ./aws/install --install-dir $HOME/.local/aws-cli --bin-dir $HOME/.local/bin
+                        export PATH=$PATH:$HOME/.local/bin
+                        aws --version
+
                         export AWS_ACCESS_KEY_ID=$AWS_USER
                         export AWS_SECRET_ACCESS_KEY=$AWS_PASS
                         export AWS_DEFAULT_REGION=us-east-1
@@ -66,28 +72,12 @@ pipeline {
                 }
             }
         }
-                // withCredentials([usernamePassword(
-                //     credentialsId: 'aws-ecr-creds',
-                //     usernameVariable: 'AWS_USER',
-                //     passwordVariable: 'AWS_PASS'
-                // )]) {
-                //     sh '''
-                //         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                //         unzip -q awscliv2.zip
-                //         ./aws/install --install-dir $HOME/.local/aws-cli --bin-dir $HOME/.local/bin
-                //         export PATH=$PATH:$HOME/.local/bin
-                //         aws --version
-
-                //         export AWS_ACCESS_KEY_ID=$AWS_USER
-                //         export AWS_SECRET_ACCESS_KEY=$AWS_PASS
-                //         export AWS_DEFAULT_REGION=${AWS_REGION}
-
-                //         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
 
         stage('Deploy to AWS') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_USER', passwordVariable: 'AWS_PASS')]) {
                     sh '''
+                        export PATH=$PATH:$HOME/.local/bin
                         export AWS_ACCESS_KEY_ID=$AWS_USER
                         export AWS_SECRET_ACCESS_KEY=$AWS_PASS
                         export AWS_DEFAULT_REGION=us-east-1
